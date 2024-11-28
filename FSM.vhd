@@ -1,22 +1,53 @@
-entity FSM is
-    Port ( clk          : in  std_logic;
-           reset        : in  std_logic;
-           start        : in  std_logic;
-           done         : out std_logic;
-           round_count  : out std_logic_vector(3 downto 0) );
-end entity;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
 
-architecture Behavioral of FSM is
-    -- Define states and FSM logic
-begin
-    process(clk, reset)
-    begin
-        if reset = '1' then
-            -- Initialize FSM
-        elsif rising_edge(clk) then
-            if start = '1' then
-                -- FSM logic for AES rounds (10 rounds for AES-128)
-            end if;
-        end if;
-    end process;
-end architecture;
+ENTITY FSM IS
+    PORT (
+        clk : IN STD_LOGIC;
+        reset : IN STD_LOGIC;
+        start : IN STD_LOGIC;
+        done : OUT STD_LOGIC;
+        round_count : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+    );
+END FSM;
+
+ARCHITECTURE Behavioral OF FSM IS
+    -- Deklarasi tipe enumerasi untuk state FSM
+    TYPE state_type IS (IDLE, PROCESS, FINISH);
+    -- Deklarasi sinyal internal untuk state dan counter
+    SIGNAL state : state_type := IDLE;
+    SIGNAL count : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
+BEGIN
+    -- Proses utama FSM
+    PROCESS (clk, reset)
+    BEGIN
+        IF reset = '1' THEN
+            -- Reset FSM ke kondisi awal
+            state <= IDLE;
+            count <= (OTHERS => '0');
+        ELSIF rising_edge(clk) THEN
+            CASE state IS
+                WHEN IDLE =>
+                    IF start = '1' THEN
+                        state <= PROCESS;
+                        count <= "0001";
+                    END IF;
+                WHEN PROCESS =>
+                    IF count = "1010" THEN -- 10 round untuk AES-128
+                        state <= FINISH;
+                    ELSE
+                        count <= count + 1;
+                    END IF;
+                WHEN FINISH =>
+                    state <= IDLE; -- Kembali ke IDLE setelah selesai
+                WHEN OTHERS =>
+                    state <= IDLE;
+            END CASE;
+        END IF;
+    END PROCESS;
+
+    -- Output sinyal `done` dan `round_count`
+    done <= '1' WHEN state = FINISH ELSE
+        '0';
+    round_count <= count;
+END Behavioral;

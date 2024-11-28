@@ -1,14 +1,18 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL; -- Untuk std_logic dan std_logic_vector
+
 entity Inv_SubBytes is
-    Port ( data_in    : in  std_logic_vector(127 downto 0);
-           data_out   : out std_logic_vector(127 downto 0) );
-end entity;
+    Port (
+        data_in  : in  std_logic_vector(127 downto 0);
+        data_out : out std_logic_vector(127 downto 0)
+    );
+end Inv_SubBytes;
 
 architecture Behavioral of Inv_SubBytes is
-    -- Internal Inverse S-box (you can define it similarly to the S-box for encryption)
 begin
     process(data_in)
     begin
-        -- Inverse S-box lookup and substitution logic
-        -- This would implement the inverse S-box
+        -- Implementasi substitusi invers berdasarkan S-box
+        data_out <= data_in; -- Placeholder, implementasikan logika sesuai kebutuhan
     end process;
-end architecture;
+end Behavioral;

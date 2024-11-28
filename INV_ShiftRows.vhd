@@ -1,16 +1,24 @@
-entity Inv_ShiftRows is
-    Port ( data_in    : in  std_logic_vector(127 downto 0);
-           data_out   : out std_logic_vector(127 downto 0) );
-end entity;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
 
-architecture Behavioral of Inv_ShiftRows is
-begin
-    process(data_in)
-    begin
-        -- Implement inverse ShiftRows operation
-        data_out(127 downto 96) <= data_in(127 downto 96);  -- row 1 (no shift)
-        data_out(95 downto 64)  <= data_in(63 downto 32);   -- row 2 (shift 1 right)
-        data_out(63 downto 32)  <= data_in(95 downto 64);   -- row 3 (shift 2 right)
-        data_out(31 downto 0)   <= data_in(31 downto 0);    -- row 4 (shift 3 right)
-    end process;
-end architecture;
+ENTITY Inv_ShiftRows IS
+    PORT (
+        data_in : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+        data_out : OUT STD_LOGIC_VECTOR(127 DOWNTO 0)
+    );
+END Inv_ShiftRows;
+
+ARCHITECTURE Behavioral OF Inv_ShiftRows IS
+BEGIN
+    PROCESS (data_in)
+    BEGIN
+        -- Row 1: no shift
+        data_out(127 DOWNTO 96) <= data_in(127 DOWNTO 96);
+        -- Row 2: shift 1
+        data_out(95 DOWNTO 64) <= data_in(63 DOWNTO 32);
+        -- Row 3: shift 2
+        data_out(63 DOWNTO 32) <= data_in(95 DOWNTO 64);
+        -- Row 4: shift 3
+        data_out(31 DOWNTO 0) <= data_in(31 DOWNTO 0);
+    END PROCESS;
+END Behavioral;
