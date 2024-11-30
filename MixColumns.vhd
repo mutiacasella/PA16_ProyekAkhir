@@ -1,83 +1,94 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity MixColumns is
-    Port (
-        data_in  : in  std_logic_vector(127 downto 0);  
-        data_out : out std_logic_vector(127 downto 0) 
+ENTITY MixColumns IS
+    PORT (
+        data_in : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+        data_out : OUT STD_LOGIC_VECTOR(127 DOWNTO 0)
     );
-end MixColumns;
+END MixColumns;
 
-architecture Behavioral of MixColumns is
+ARCHITECTURE Behavioral OF MixColumns IS
     -- Perkalian matriks Galois Field GF(2⁸)
-    function gf_mult(a: std_logic_vector(7 downto 0); b: std_logic_vector(7 downto 0)) return std_logic_vector is
-        variable result : std_logic_vector(7 downto 0) := (others => '0');
-        variable temp_a : std_logic_vector(7 downto 0);
-        variable temp_b : std_logic_vector(7 downto 0);
-    begin
+    FUNCTION gf_mult(a : STD_LOGIC_VECTOR(7 DOWNTO 0); b : STD_LOGIC_VECTOR(7 DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS
+        VARIABLE result : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+        VARIABLE temp_a : STD_LOGIC_VECTOR(7 DOWNTO 0);
+        VARIABLE temp_b : STD_LOGIC_VECTOR(7 DOWNTO 0);
+    BEGIN
         temp_a := a;
         temp_b := b;
 
-        for i in 0 to 7 loop
+        FOR i IN 0 TO 7 LOOP
             -- Jika bit LSB temp_b adalah 1, tambahkan temp_a ke hasil (XOR di GF(2⁸))
-            if temp_b(0) = '1' then
-                result := result xor temp_a;
-            end if;
+            IF temp_b(0) = '1' THEN
+                result := result XOR temp_a;
+            END IF;
+
+            -- Shift temp_a ke kiri dan lakukan modular reduction jika bit MSB-nya 1
+            IF temp_a(7) = '1' THEN
+                temp_a := (temp_a(6 DOWNTO 0) & '0') XOR X"1B"; -- Modular XOR dengan x⁸ + x⁴ + x³ + x + 1 
+            ELSE
+                temp_a := temp_a(6 DOWNTO 0) & '0';
+            END IF;
 
             -- Shift temp_b ke kanan
-            if temp_a(7) = '1' then
-                temp_a := (temp_a(6 downto 0) & '0') xor X"1B"; -- Modular XOR dengan x⁸ + x⁴ + x³ + x + 1 
-            else
-                temp_a := temp_a(6 downto 0) & '0';
-            end if;
+            temp_b := '0' & temp_b(7 DOWNTO 1);
+        END LOOP;
 
-            temp_b := '0' & temp_b(7 downto 1); -- Shift right temp_b
-        end loop;
+        RETURN result;
+    END FUNCTION;
 
-        return result;
-    end function;
+    -- Tipe untuk merepresentasikan matriks
+    TYPE matrix_4x4 IS ARRAY (0 TO 3, 0 TO 3) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
+    TYPE column IS ARRAY (0 TO 3) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- Matriks untuk MixColumns
-    constant MIX_MATRIX : array(0 to 3, 0 to 3) of std_logic_vector(7 downto 0) := (
-        ("00000010", "00000011", "00000001", "00000001"),
-        ("00000001", "00000010", "00000011", "00000001"), 
-        ("00000001", "00000001", "00000010", "00000011"),
-        ("00000011", "00000001", "00000001", "00000010")  
+    --CONSTANT MIX_MATRIX : matrix_4x4 := (
+    --("00000010", "00000003", "00000001", "00000001"),
+    --    ("00000001", "00000002", "00000003", "00000001"),
+    --    ("00000001", "00000001", "00000002", "00000003"),
+    --    ("00000003", "00000001", "00000001", "00000002")
+    --);
+
+    constant MIX_MATRIX : matrix_4x4 := (
+        (X"02", X"03", X"01", X"01"),
+        (X"01", X"02", X"03", X"01"),
+        (X"01", X"01", X"02", X"03"),
+        (X"03", X"01", X"01", X"02")
     );
 
-begin
-    process(data_in)
-        variable state_in  : array(0 to 3, 0 to 3) of std_logic_vector(7 downto 0); -- matrix input (4x4)
-        variable state_out : array(0 to 3, 0 to 3) of std_logic_vector(7 downto 0); -- matrix output (4x4)
-        variable col       : array(0 to 3) of std_logic_vector(7 downto 0);
-        variable result    : std_logic_vector(127 downto 0);
-    begin
+BEGIN
+    PROCESS (data_in)
+        VARIABLE state_in : matrix_4x4;
+        VARIABLE state_out : matrix_4x4;
+        VARIABLE result : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    BEGIN
         -- Load input ke dalam matriks 4x4
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                state_in(j, i) := data_in((i*32 + j*8 + 7) downto (i*32 + j*8));
-            end loop;
-        end loop;
+        FOR i IN 0 TO 3 LOOP
+            FOR j IN 0 TO 3 LOOP
+                state_in(j, i) := data_in((i * 32 + j * 8 + 7) DOWNTO (i * 32 + j * 8));
+            END LOOP;
+        END LOOP;
 
         -- Operasi MixColumns
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                state_out(j, i) := 
-                    gf_mult(state_in(0, i), MIX_MATRIX(j, 0)) xor
-                    gf_mult(state_in(1, i), MIX_MATRIX(j, 1)) xor
-                    gf_mult(state_in(2, i), MIX_MATRIX(j, 2)) xor
-                    gf_mult(state_in(3, i), MIX_MATRIX(j, 3));
-            end loop;
-        end loop;
+        FOR i IN 0 TO 3 LOOP
+            FOR j IN 0 TO 3 LOOP
+                state_out(j, i) :=
+                gf_mult(state_in(0, i), MIX_MATRIX(j, 0)) XOR
+                gf_mult(state_in(1, i), MIX_MATRIX(j, 1)) XOR
+                gf_mult(state_in(2, i), MIX_MATRIX(j, 2)) XOR
+                gf_mult(state_in(3, i), MIX_MATRIX(j, 3));
+            END LOOP;
+        END LOOP;
 
         -- Hasil perkalian matriks disimpan ke data_out
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                result((i*32 + j*8 + 7) downto (i*32 + j*8)) := state_out(j, i);
-            end loop;
-        end loop;
+        FOR i IN 0 TO 3 LOOP
+            FOR j IN 0 TO 3 LOOP
+                result((i * 32 + j * 8 + 7) DOWNTO (i * 32 + j * 8)) := state_out(j, i);
+            END LOOP;
+        END LOOP;
 
         data_out <= result;
-    end process;
-end Behavioral;
+    END PROCESS;
+END Behavioral;
