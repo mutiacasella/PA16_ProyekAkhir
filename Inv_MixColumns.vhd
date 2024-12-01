@@ -2,14 +2,14 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
-ENTITY INV_MixColumns IS
+ENTITY Inv_MixColumns IS
     PORT (
         data_in : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
         data_out : OUT STD_LOGIC_VECTOR(127 DOWNTO 0)
     );
-END INV_MixColumns;
+END Inv_MixColumns;
 
-ARCHITECTURE Behavioral OF INV_MixColumns IS
+ARCHITECTURE Behavioral OF Inv_MixColumns IS
     -- Perkalian matriks Galois Field GF(2⁸)
     FUNCTION gf_mult(a : STD_LOGIC_VECTOR(7 DOWNTO 0); b : STD_LOGIC_VECTOR(7 DOWNTO 0)) RETURN STD_LOGIC_VECTOR IS
         VARIABLE result : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');

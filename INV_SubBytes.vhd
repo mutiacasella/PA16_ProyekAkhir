@@ -2,14 +2,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity INV_SubBytes is
+entity Inv_SubBytes is
     Port (
         data_in  : in  std_logic_vector(127 downto 0); 
         data_out : out std_logic_vector(127 downto 0)
     );
-end INV_SubBytes;
+end Inv_SubBytes;
 
-architecture Behavioral of INV_SubBytes is
+architecture Behavioral of Inv_SubBytes is
     -- Tabel Inverse S-Box
     type InvSBoxArray is array (0 to 255) of std_logic_vector(7 downto 0);
     constant InvSBox : InvSBoxArray := (
