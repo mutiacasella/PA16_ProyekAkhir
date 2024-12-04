@@ -26,7 +26,10 @@ ARCHITECTURE Behavioral OF AES_Decryption IS
 
     -- Key Expansion Instance
     SIGNAL round_keys : STD_LOGIC_VECTOR(1407 DOWNTO 0); -- 44 x 32-bit keys (11 x 128-bit keys)
+    SIGNAL done_internal : STD_LOGIC := '0';
+
 BEGIN
+
     -- Key Expansion Instance
     key_expansion_instance : ENTITY work.KeyExpansion
         PORT MAP(
@@ -37,7 +40,7 @@ BEGIN
     -- Round Key Selector
     PROCESS (round_count)
     BEGIN
-        round_key <= round_keys((10 - round_count + 1) * 128 - 1 DOWNTO (10 - round_count) * 128);
+        round_key <= round_keys((10 - to_integer(unsigned(round_count)) + 1) * 128 - 1 DOWNTO (10 - to_integer(unsigned(round_count))) * 128);
     END PROCESS;
 
     -- Tahap 1: AddRoundKey
@@ -102,9 +105,11 @@ BEGIN
         IF reset = '1' THEN
             plaintext <= (OTHERS => '0');
         ELSIF rising_edge(clk) THEN
-            IF done = '1' THEN
+            IF done_internal = '1' THEN
                 plaintext <= current_state;
             END IF;
         END IF;
     END PROCESS;
+
+    done <= done_internal;
 END Behavioral;

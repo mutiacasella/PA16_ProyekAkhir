@@ -44,13 +44,6 @@ ARCHITECTURE Behavioral OF MixColumns IS
     TYPE column IS ARRAY (0 TO 3) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- Matriks untuk MixColumns
-    --CONSTANT MIX_MATRIX : matrix_4x4 := (
-    --("00000010", "00000003", "00000001", "00000001"),
-    --    ("00000001", "00000002", "00000003", "00000001"),
-    --    ("00000001", "00000001", "00000002", "00000003"),
-    --    ("00000003", "00000001", "00000001", "00000002")
-    --);
-
     constant MIX_MATRIX : matrix_4x4 := (
         (X"02", X"03", X"01", X"01"),
         (X"01", X"02", X"03", X"01"),

@@ -32,13 +32,14 @@ architecture Structural of KeyExpansion is
     -- Sinyal untuk menghubungkan komponen SBox_Table
     signal sbox_in : std_logic_vector(31 downto 0);
     signal sbox_out : std_logic_vector(31 downto 0);
-begin
 
     -- RotWord 
     function RotWord(word_in : std_logic_vector(31 downto 0)) return std_logic_vector is
     begin
         return word_in(23 downto 0) & word_in(31 downto 24);
     end function;
+
+begin
 
     -- Instansiasi Komponen SBox_Table untuk SubWord
     SBox_Byte0: SBox_Table

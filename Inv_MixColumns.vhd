@@ -40,11 +40,11 @@ ARCHITECTURE Behavioral OF Inv_MixColumns IS
     TYPE matrix_4x4 IS ARRAY (0 TO 3, 0 TO 3) OF STD_LOGIC_VECTOR(7 DOWNTO 0);
 
     -- Matriks untuk Inverse MixColumns
-    CONSTANT INV_MIX_MATRIX : matrix_4x4 := (
-        ("00001110", "00001011", "00001101", "00001001"),
-        ("00001001", "00001110", "00001011", "00001101"),
-        ("00001101", "00001001", "00001110", "00001011"),
-        ("00001011", "00001101", "00001001", "00001110")
+    constant INV_MIX_MATRIX : matrix_4x4 := (
+        (X"0E", X"0B", X"0D", X"09"),
+        (X"09", X"0E", X"0B", X"0D"),
+        (X"0D", X"09", X"0E", X"0B"),
+        (X"0B", X"0D", X"09", X"0E")
     );
 
 BEGIN
