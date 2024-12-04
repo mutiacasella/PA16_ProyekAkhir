@@ -1,102 +1,110 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-entity AES_Decryption is
-    Port (
-        clk          : in  std_logic;
-        reset        : in  std_logic;
-        start        : in  std_logic;
-        ciphertext   : in  std_logic_vector(127 downto 0);
-        key          : in  std_logic_vector(127 downto 0);
-        plaintext    : out std_logic_vector(127 downto 0);
-        done         : out std_logic;
-        round_active : in  std_logic; -- Sinyal dari FSM
-        round_count  : in  std_logic_vector(3 downto 0) -- Ronde saat ini
+ENTITY AES_Decryption IS
+    PORT (
+        clk : IN STD_LOGIC;
+        reset : IN STD_LOGIC;
+        start : IN STD_LOGIC;
+        ciphertext : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+        key : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+        plaintext : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+        done : OUT STD_LOGIC;
+        round_active : IN STD_LOGIC; -- Sinyal dari FSM
+        round_count : IN STD_LOGIC_VECTOR(3 DOWNTO 0) -- Ronde saat ini
     );
-end AES_Decryption;
+END AES_Decryption;
 
-architecture Behavioral of AES_Decryption is
-    signal current_state      : std_logic_vector(127 downto 0);
-    signal round_key          : std_logic_vector(127 downto 0);
-    signal inv_shiftrows_out  : std_logic_vector(127 downto 0);
-    signal inv_subbytes_out   : std_logic_vector(127 downto 0);
-    signal inv_mixcolumns_out : std_logic_vector(127 downto 0);
+ARCHITECTURE Behavioral OF AES_Decryption IS
+    SIGNAL current_state : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    SIGNAL round_key : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    SIGNAL addroundkey_out : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    SIGNAL inv_shiftrows_out : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    SIGNAL inv_subbytes_out : STD_LOGIC_VECTOR(127 DOWNTO 0);
+    SIGNAL inv_mixcolumns_out : STD_LOGIC_VECTOR(127 DOWNTO 0);
 
     -- Key Expansion Instance
-    signal round_keys         : std_logic_vector(1407 downto 0); -- 44 x 32-bit keys (11 x 128-bit keys)
-begin
+    SIGNAL round_keys : STD_LOGIC_VECTOR(1407 DOWNTO 0); -- 44 x 32-bit keys (11 x 128-bit keys)
+BEGIN
     -- Key Expansion Instance
-    key_expansion_instance: entity work.KeyExpansion
-        port map (
-            key_in      => key,
-            round_keys  => round_keys
+    key_expansion_instance : ENTITY work.KeyExpansion
+        PORT MAP(
+            key_in => key,
+            round_keys => round_keys
         );
 
     -- Round Key Selector
-    process(round_count)
-    begin
-        round_key <= round_keys((10-round_count+1)*128-1 downto (10-round_count)*128);
-    end process;
+    PROCESS (round_count)
+    BEGIN
+        round_key <= round_keys((10 - round_count + 1) * 128 - 1 DOWNTO (10 - round_count) * 128);
+    END PROCESS;
 
-    -- Tahap 1: AddRoundKey (Ronde 0)
-    process(clk, reset)
-    begin
-        if reset = '1' then
-            current_state <= (others => '0');
-        elsif rising_edge(clk) then
-            if round_active = '1' and round_count = "0000" then
-                current_state <= ciphertext xor round_key;
-            end if;
-        end if;
-    end process;
+    -- Tahap 1: AddRoundKey
+    addroundkey_instance : ENTITY work.AddRoundKey
+        PORT MAP(
+            data_in => ciphertext,
+            round_key => round_key,
+            data_out => addroundkey_out
+        );
+
+    PROCESS (clk, reset)
+    BEGIN
+        IF reset = '1' THEN
+            current_state <= (OTHERS => '0');
+        ELSIF rising_edge(clk) THEN
+            IF round_active = '1' AND round_count = "0000" THEN
+                current_state <= addroundkey_out;
+            END IF;
+        END IF;
+    END PROCESS;
 
     -- Tahap 2: Inv_ShiftRows
-    inv_shiftrows_instance: entity work.Inv_ShiftRows
-        port map (
-            data_in  => current_state,
+    inv_shiftrows_instance : ENTITY work.Inv_ShiftRows
+        PORT MAP(
+            data_in => current_state,
             data_out => inv_shiftrows_out
         );
 
     -- Tahap 3: Inv_SubBytes
-    inv_subbytes_instance: entity work.Inv_SubBytes
-        port map (
-            data_in  => inv_shiftrows_out,
+    inv_subbytes_instance : ENTITY work.Inv_SubBytes
+        PORT MAP(
+            data_in => inv_shiftrows_out,
             data_out => inv_subbytes_out
         );
 
     -- Tahap 4: Inv_MixColumns (untuk ronde 1 hingga 9)
-    inv_mixcolumns_instance: entity work.Inv_MixColumns
-        port map (
-            data_in  => inv_subbytes_out,
+    inv_mixcolumns_instance : ENTITY work.Inv_MixColumns
+        PORT MAP(
+            data_in => inv_subbytes_out,
             data_out => inv_mixcolumns_out
         );
 
     -- Update Current State
-    process(clk, reset)
-    begin
-        if reset = '1' then
-            current_state <= (others => '0');
-        elsif rising_edge(clk) then
-            if round_active = '1' then
-                if round_count /= "1010" then -- Untuk ronde 1 hingga 9
-                    current_state <= inv_mixcolumns_out xor round_key;
-                else                          -- Untuk ronde ke-10
-                    current_state <= inv_subbytes_out xor round_key;
-                end if;
-            end if;
-        end if;
-    end process;
+    PROCESS (clk, reset)
+    BEGIN
+        IF reset = '1' THEN
+            current_state <= (OTHERS => '0');
+        ELSIF rising_edge(clk) THEN
+            IF round_active = '1' THEN
+                IF round_count /= "1010" THEN -- Untuk ronde 1 hingga 9
+                    current_state <= inv_mixcolumns_out XOR round_key;
+                ELSE -- Untuk ronde ke-10
+                    current_state <= inv_subbytes_out XOR round_key;
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
 
     -- Output plaintext
-    process(clk, reset)
-    begin
-        if reset = '1' then
-            plaintext <= (others => '0');
-        elsif rising_edge(clk) then
-            if done = '1' then
+    PROCESS (clk, reset)
+    BEGIN
+        IF reset = '1' THEN
+            plaintext <= (OTHERS => '0');
+        ELSIF rising_edge(clk) THEN
+            IF done = '1' THEN
                 plaintext <= current_state;
-            end if;
-        end if;
-    end process;
-end Behavioral;
+            END IF;
+        END IF;
+    END PROCESS;
+END Behavioral;

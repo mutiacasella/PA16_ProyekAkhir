@@ -19,6 +19,7 @@ end AES_Encryption;
 architecture Behavioral of AES_Encryption is
     signal current_state   : std_logic_vector(127 downto 0);
     signal round_key       : std_logic_vector(127 downto 0);
+    signal addroundkey_out : std_logic_vector(127 downto 0);
     signal subbytes_out    : std_logic_vector(127 downto 0);
     signal shiftrows_out   : std_logic_vector(127 downto 0);
     signal mixcolumns_out  : std_logic_vector(127 downto 0);
@@ -39,14 +40,21 @@ begin
         round_key <= round_keys((round_count+1)*128-1 downto round_count*128);
     end process;
 
-    -- Tahap 1: AddRoundKey (Ronde 0)
+    -- Tahap 1: AddRoundKey
+    addroundkey_instance: entity work.AddRoundKey
+        port map (
+            data_in    => plaintext,
+            round_key  => round_key,
+            data_out   => addroundkey_out
+        );
+
     process(clk, reset)
     begin
         if reset = '1' then
             current_state <= (others => '0');
         elsif rising_edge(clk) then
             if round_active = '1' and round_count = "0000" then
-                current_state <= plaintext xor round_key;
+                current_state <= addroundkey_out;
             end if;
         end if;
     end process;
