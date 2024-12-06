@@ -5,6 +5,7 @@ use IEEE.STD_LOGIC_TEXTIO.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use STD.TEXTIO.ALL;
 use work.aes_package.all;
+use std.env.all;
 
 entity AES_Encryption_Testbench is
 end AES_Encryption_Testbench;
@@ -18,7 +19,12 @@ architecture Behavioral of AES_Encryption_Testbench is
             data_in : in STD_LOGIC_VECTOR(127 downto 0);
             key : in STD_LOGIC_VECTOR(127 downto 0);
             data_out : out STD_LOGIC_VECTOR(127 downto 0);
-            done : out STD_LOGIC
+            done : out STD_LOGIC;
+            debug_state_out : out state_array;
+            debug_sub_bytes_out : out state_array;
+            debug_shift_rows_out : out state_array;
+            debug_mix_cols_out : out state_array;
+            debug_round_key_out : out STD_LOGIC_VECTOR(127 downto 0)
         );
     end component;
 
@@ -30,6 +36,13 @@ architecture Behavioral of AES_Encryption_Testbench is
     signal data_out : STD_LOGIC_VECTOR(127 downto 0);
     signal done : STD_LOGIC;
     
+    -- Add debug signals
+    signal debug_state : state_array;
+    signal debug_sub_bytes : state_array;
+    signal debug_shift_rows : state_array;
+    signal debug_mix_cols : state_array;
+    signal debug_round_key : STD_LOGIC_VECTOR(127 downto 0);
+
     -- Clock period
     constant clk_period : time := 10 ns;
 
@@ -68,76 +81,72 @@ architecture Behavioral of AES_Encryption_Testbench is
         return result;
     end function;
 
-    function state_to_slv(state: state_array) return std_logic_vector is
-        variable result: std_logic_vector(127 downto 0);
+    function slv_to_hex(slv: std_logic_vector(127 downto 0)) return string is
+        variable result : string(1 to 32);
+        variable nibble : std_logic_vector(3 downto 0);
     begin
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                result(127-32*i-8*j downto 120-32*i-8*j) := state(i,j);
-            end loop;
-        end loop;
-        return result;
-    end function;
-    
-    -- Modified write_state_array procedure
-    procedure write_state_array(
-        file f: text;
-        state_name: in string;
-        state_val: in state_array) is
-        variable l: line;
-    begin
-        write(l, state_name & ":");
-        writeline(f, l);
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                write(l, string'("  "));
-                hwrite(l, state_val(i,j));
-            end loop;
-            writeline(f, l);
-        end loop;
-    end procedure;
-
-    -- Add signals for monitoring intermediate states
-    signal sub_bytes_out : state_array;
-    signal shift_rows_out : state_array;
-    signal mix_columns_out : state_array;
-    signal add_round_key_out : state_array;
-    signal round_keys : std_logic_vector(1407 downto 0);
-
-    -- Add function to format hex output
-    function format_hex(slv: std_logic_vector(127 downto 0)) return string is
-        variable result: string(1 to 32);
-        variable nibble: std_logic_vector(3 downto 0);
-    begin
-        for i in 31 downto 0 loop
+        for i in 0 to 31 loop
             nibble := slv(127-4*i downto 124-4*i);
             case to_integer(unsigned(nibble)) is
-                when  0 => result(32-i) := '0';
-                when  1 => result(32-i) := '1';
-                when  2 => result(32-i) := '2';
-                when  3 => result(32-i) := '3';
-                when  4 => result(32-i) := '4';
-                when  5 => result(32-i) := '5';
-                when  6 => result(32-i) := '6';
-                when  7 => result(32-i) := '7';
-                when  8 => result(32-i) := '8';
-                when  9 => result(32-i) := '9';
-                when 10 => result(32-i) := 'A';
-                when 11 => result(32-i) := 'B';
-                when 12 => result(32-i) := 'C';
-                when 13 => result(32-i) := 'D';
-                when 14 => result(32-i) := 'E';
-                when 15 => result(32-i) := 'F';
-                when others => result(32-i) := 'X';
+                when  0 => result(i+1) := '0';
+                when  1 => result(i+1) := '1';
+                when  2 => result(i+1) := '2';
+                when  3 => result(i+1) := '3';
+                when  4 => result(i+1) := '4';
+                when  5 => result(i+1) := '5';
+                when  6 => result(i+1) := '6';
+                when  7 => result(i+1) := '7';
+                when  8 => result(i+1) := '8';
+                when  9 => result(i+1) := '9';
+                when 10 => result(i+1) := 'a';
+                when 11 => result(i+1) := 'b';
+                when 12 => result(i+1) := 'c';
+                when 13 => result(i+1) := 'd';
+                when 14 => result(i+1) := 'e';
+                when 15 => result(i+1) := 'f';
+                when others => result(i+1) := 'x';
             end case;
         end loop;
         return result;
     end function;
 
-    -- Add monitoring signals
-    signal monitor_state : state_array;
-    signal monitor_key : std_logic_vector(127 downto 0);
-    signal monitor_round : integer range 0 to 10;
+    -- Add state array to hex string function
+    function state_to_hex(state: state_array) return string is
+        variable result : string(1 to 32);
+        variable byte_val : std_logic_vector(7 downto 0);
+        variable idx : integer;
+    begin
+        idx := 1;
+        for i in 0 to 3 loop
+            for j in 0 to 3 loop
+                byte_val := state(i,j);
+                for k in 0 to 1 loop
+                    case to_integer(unsigned(byte_val((7-4*k) downto (4-4*k)))) is
+                        when 0 to 9 => 
+                            result(idx) := character'val(character'pos('0') + 
+                                            to_integer(unsigned(byte_val((7-4*k) downto (4-4*k)))));
+                        when 10 to 15 => 
+                            result(idx) := character'val(character'pos('a') + 
+                                            to_integer(unsigned(byte_val((7-4*k) downto (4-4*k)))) - 10);
+                        when others => result(idx) := 'x';
+                    end case;
+                    idx := idx + 1;
+                end loop;
+            end loop;
+        end loop;
+        return result;
+    end function;
+
+    -- Add before begin
+    function is_x(s: string) return boolean is
+    begin
+        for i in s'range loop
+            if s(i) = 'x' then
+                return true;
+            end if;
+        end loop;
+        return false;
+    end function;
 
 begin
     -- Instantiate AES_Encryption
@@ -147,7 +156,12 @@ begin
         data_in => data_in,
         key => key,
         data_out => data_out,
-        done => done
+        done => done,
+        debug_state_out => debug_state,
+        debug_sub_bytes_out => debug_sub_bytes,
+        debug_shift_rows_out => debug_shift_rows,
+        debug_mix_cols_out => debug_mix_cols,
+        debug_round_key_out => debug_round_key
     );
 
     -- Clock generation
@@ -170,15 +184,11 @@ begin
         variable expected_str : string(1 to 32);
         variable space : character;
     begin
-        -- Initial state
-        test_state <= INIT;
-        current_round <= 0;
-        
-        -- File operations
+        -- Open files
         file_open(input_file, "aes_test_vectors.txt", read_mode);
         file_open(output_file, "aes_debug.txt", write_mode);
 
-        -- Write header and read input
+        -- Read test vector
         readline(input_file, input_line);
         read(input_line, plaintext_str);
         read(input_line, space);
@@ -186,49 +196,62 @@ begin
         read(input_line, space);
         read(input_line, expected_str);
 
-        -- Write test header
+        -- Write test setup info
         write(output_line, string'("=== AES Encryption Test ==="));
         writeline(output_file, output_line);
-        write(output_line, string'("Input : ") & plaintext_str);
+        write(output_line, string'("Plaintext: ") & plaintext_str);
         writeline(output_file, output_line);
-        write(output_line, string'("Key   : ") & key_str);
+        write(output_line, string'("Key      : ") & key_str);
+        writeline(output_file, output_line);
+        write(output_line, string'("Expected : ") & expected_str);
         writeline(output_file, output_line);
         writeline(output_file, output_line);
 
-        -- Start encryption
+        -- Initial setup
+        test_state <= INIT;
+        current_round <= 0;
+
+        -- Reset sequence
         rst <= '1';
         wait for clk_period*2;
         rst <= '0';
         
+        -- Apply inputs
         data_in <= hex_to_slv(plaintext_str);
         key <= hex_to_slv(key_str);
         test_state <= RUNNING;
-
-        -- Monitor rounds
+        
+        -- Wait for key expansion
+        wait for clk_period*2;
+        
+        -- Monitor encryption process
         while test_state /= TEST_DONE loop
-            wait for clk_period;
-            
-            -- Write round information
+            -- Debug headers
+            write(output_line, string'("----------------------------------------"));
+            writeline(output_file, output_line);
             write(output_line, string'("Round ") & integer'image(current_round));
             writeline(output_file, output_line);
             
-            -- Write state information using write_state_array
-            write_state_array(output_file, "State", sub_bytes_out);
-            write_state_array(output_file, "After SubBytes", sub_bytes_out);
-            write_state_array(output_file, "After ShiftRows", shift_rows_out);
-            
-            if current_round /= 10 then
-                write_state_array(output_file, "After MixColumns", mix_columns_out);
-            end if;
-            
-            -- Write round key
-            write(output_line, string'("Round Key: "));
-            write(output_line, format_hex(round_keys(1407-128*current_round downto 1280-128*current_round)));
+            -- Debug state values
+            write(output_line, string'("Current state: "));
             writeline(output_file, output_line);
-            writeline(output_file, output_line);  -- blank line
+            write(output_line, string'("  State     : ") & state_to_hex(debug_state));
+            writeline(output_file, output_line);
+            write(output_line, string'("  SubBytes  : ") & state_to_hex(debug_sub_bytes));
+            writeline(output_file, output_line);
+            write(output_line, string'("  ShiftRows : ") & state_to_hex(debug_shift_rows));
+            writeline(output_file, output_line);
+            write(output_line, string'("  MixCols   : ") & state_to_hex(debug_mix_cols));
+            writeline(output_file, output_line);
+            write(output_line, string'("  RoundKey  : ") & slv_to_hex(debug_round_key));
+            writeline(output_file, output_line);
+            writeline(output_file, output_line);
             
+            -- Update state and wait
             if done = '1' then
                 test_state <= TEST_DONE;
+                write(output_line, string'("========== Encryption Complete =========="));
+                writeline(output_file, output_line);
             elsif current_round < 10 then
                 current_round <= current_round + 1;
             end if;
@@ -236,23 +259,26 @@ begin
             wait for clk_period;
         end loop;
 
-        -- Write results
-        write(output_line, string'("=== Final Results ==="));
+        -- Write final results
+        write(output_line, string'("Final Results:"));
         writeline(output_file, output_line);
-        write(output_line, string'("Result  : ") & format_hex(data_out));
+        write(output_line, string'("Output   : ") & slv_to_hex(data_out));
         writeline(output_file, output_line);
-        write(output_line, string'("Expected: ") & expected_str);
+        write(output_line, string'("Expected : ") & expected_str);
         writeline(output_file, output_line);
         
         if data_out = hex_to_slv(expected_str) then
-            write(output_line, string'("TEST PASSED"));
+            write(output_line, string'("Status: PASS"));
         else
-            write(output_line, string'("TEST FAILED"));
+            write(output_line, string'("Status: FAIL"));
         end if;
         writeline(output_file, output_line);
 
+        -- Cleanup and end
         file_close(input_file);
         file_close(output_file);
+        report "Simulation complete";
+        std.env.stop(0);
         wait;
     end process;
 
