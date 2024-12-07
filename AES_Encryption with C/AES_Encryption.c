@@ -284,6 +284,17 @@ int main() {
     
     printf("\nResult:\n");
     print_hex("Ciphertext", ciphertext);
+
+    printf("\nTest Vector Format:\n");
+    for(int i = 0; i < 16; i++)
+        printf("%02x", plaintext[i]);
+    printf(" ");
+    for(int i = 0; i < 16; i++)
+        printf("%02x", key[i]);
+    printf(" ");
+    for(int i = 0; i < 16; i++)
+        printf("%02x", ciphertext[i]);
+    printf("\n");
     
     return 0;
 }
