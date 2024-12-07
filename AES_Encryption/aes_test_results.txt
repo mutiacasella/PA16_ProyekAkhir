@@ -1,0 +1,109 @@
+=== AES Encryption Test ===
+Plaintext: 00112233445566778899aabbccddeeff
+Key      : 000102030405060708090a0b0c0d0e0f
+Expected : 69c4e0d86a7b0430d8cdb78070b4c55a
+
+----------------------------------------
+Round 0
+Current state: 
+  State     : 00000000000000000000000000000000
+  SubBytes  : 00000000000000000000000000000000
+  ShiftRows : 00000000000000000000000000000000
+  MixCols   : 00000000000000000000000000000000
+  RoundKey  : 000102030405060708090a0b0c0d0e0f
+
+----------------------------------------
+Round 1
+Current state: 
+  State     : 004080c0105090d02060a0e03070b0f0
+  SubBytes  : 6309cdbaca536070b7d0e0e10451e78c
+  ShiftRows : 6309cdba536070cae0e1b7d08c0451e7
+  MixCols   : 5f57f71d72f5beb964bc3bf91592291a
+  RoundKey  : d6aa74fdd2af72fadaa678f1d6ab76fe
+
+----------------------------------------
+Round 2
+Current state: 
+  State     : 89852dcbd85a181210ce438fe868d8e4
+  SubBytes  : a797d81f61beadc9ca8b1a739b456169
+  ShiftRows : a797d81fbeadc9611a73ca8b699b4561
+  MixCols   : ff31647787d8513a966a51d08451fa09
+  RoundKey  : b692cf0b643dbdf1be9bc5006830b3fe
+
+----------------------------------------
+Round 3
+Current state: 
+  State     : 4955da1f15e5ca0a59d794638fa0faf7
+  SubBytes  : 3bfc57c059d97467cb0e22fb73e02d68
+  ShiftRows : 3bfc57c0d974675922fbcb0e6873e02d
+  MixCols   : 4cf72c539c713f4d1ef086f266768e56
+  RoundKey  : b6ff744ed2c2c9bf6c590cbf0469bf41
+
+----------------------------------------
+Round 4
+Current state: 
+  State     : fa25405763b366246a398a4d28c93117
+  SubBytes  : 2d3f095bfb6d333602127ee334ddc7f0
+  ShiftRows : 2d3f095b6d3336fb7ee30212f034ddc7
+  MixCols   : 63fc97758553be47b78d47d69ff98e91
+  RoundKey  : 47f7f7bc95353e03f96c32bcfd058dfd
+
+----------------------------------------
+Round 5
+Current state: 
+  State     : 24696e887266d24240b3755b23fa326c
+  SubBytes  : 36f99fc44033b52c096d9d39262d2350
+  ShiftRows : 36f99fc433b52c409d39096d50262d23
+  MixCols   : f432751dbce5f1d0d454d63b54d0c53c
+  RoundKey  : 3caaa3e8a99f9deb50f3af57adf622aa
+
+----------------------------------------
+Round 6
+Current state: 
+  State     : c89b25b0167a022677c97919bc3b9296
+  SubBytes  : e8143fe747da77f7f5ddb6d465e24f90
+  ShiftRows : e8143fe7da77f747b6d4f5dd9065e24f
+  MixCols   : 98006b8e16f82c5aee7f04d074559c36
+  RoundKey  : 5e390f7df7a69296a7553dc10aa31f6b
+
+----------------------------------------
+Round 7
+Current state: 
+  State     : c6f7cc842f5e79f9e1ed39cf09c35d5d
+  SubBytes  : b4684b5f1558b699f855128a012e4c4c
+  ShiftRows : b4684b5f58b69915128af8554c012e4c
+  MixCols   : c59af0987e9b5fc61cd24b341586e039
+  RoundKey  : 14f9701ae35fe28c440adf4d4ea9c026
+
+----------------------------------------
+Round 8
+Current state: 
+  State     : d179b4d687c4556f6c3094f40f0aad1f
+  SubBytes  : 3eb68df6171cfca8500422bf766795c0
+  ShiftRows : 3eb68df61cfca81722bf5004c0766795
+  MixCols   : baa1d55fa0f951413db52c4de76eba23
+  RoundKey  : 47438735a41c65b9e016baf4aebf7ad2
+
+----------------------------------------
+Round 9
+Current state: 
+  State     : fd0535f1e3e547febad09637d2d74ef1
+  SubBytes  : 546b96a111d9a0bbf470909ab50e2fa1
+  ShiftRows : 546b96a1d9a0bb11909af470a1b50e2f
+  MixCols   : e9021b35f730f23c4e20cc21ecf6f2c7
+  RoundKey  : 549932d1f08557681093ed9cbe2c974e
+
+----------------------------------------
+Round 10
+Current state: 
+  State     : bdf20b8b6eb561107c7721b63d9e6e89
+  SubBytes  : 7a892b3d9fd5efca10f5fd4e270b9fa7
+  ShiftRows : 7a892b3dd5efca9ffd4e10f5a7270b9f
+  MixCols   : ca4a08aa70b99f83bc93dce9f36fb108
+  RoundKey  : 13111d7fe3944a17f307a78b4d2b30c5
+
+========== Encryption Complete ==========
+Final Results:
+Output   : 69c4e0d86a7b0430d8cdb78070b4c55a
+Expected : 69c4e0d86a7b0430d8cdb78070b4c55a
+Status: PASS

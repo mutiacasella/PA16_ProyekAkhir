@@ -2,7 +2,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use work.aes_package.all;
-use IEEE.STD_LOGIC_TEXTIO.ALL;
 
 entity AES_Encryption is
     Port ( 
@@ -29,6 +28,7 @@ architecture Behavioral of AES_Encryption is
     signal round_keys : STD_LOGIC_VECTOR(1407 downto 0);
     signal current_round_key : STD_LOGIC_VECTOR(127 downto 0);
     signal key_expanded : STD_LOGIC := '0';
+    signal initial_state_loaded : STD_LOGIC := '0';
 
     -- S-box and round constants
     type sbox_array is array (0 to 255) of STD_LOGIC_VECTOR(7 downto 0);
@@ -61,7 +61,7 @@ architecture Behavioral of AES_Encryption is
     begin
         for i in 0 to 3 loop
             for j in 0 to 3 loop
-                result(127-8*(4*i+j) downto 120-8*(4*i+j)) := state_in(i,j);
+                result(127-8*(4*i+j) downto 120-8*(4*i+j)) := state_in(j,i);
             end loop;
         end loop;
         return result;
@@ -191,18 +191,20 @@ architecture Behavioral of AES_Encryption is
 
 begin
     -- Key expansion process
-    key_expansion: process(clk, rst)
+    process(clk, rst)
         type word_array is array (0 to 43) of STD_LOGIC_VECTOR(31 downto 0);
         variable w : word_array;
         variable temp : STD_LOGIC_VECTOR(31 downto 0);
-        variable temp_byte : STD_LOGIC_VECTOR(7 downto 0);
     begin
         if rst = '1' then
             key_expanded <= '0';
             round_keys <= (others => '0');
         elsif rising_edge(clk) then
-            if key_expanded = '0' then
-                -- Initialize w with input key
+            if not key_expanded then
+                -- Store original key as first round key
+                round_keys(1407 downto 1280) <= key;
+                
+                -- Initialize w with key
                 w(0) := key(127 downto 96);
                 w(1) := key(95 downto 64);
                 w(2) := key(63 downto 32);
@@ -211,28 +213,24 @@ begin
                 -- Generate remaining words
                 for i in 4 to 43 loop
                     temp := w(i-1);
-                    
                     if (i mod 4 = 0) then
-                        -- RotWord: rotate byte-wise
+                        -- RotWord
                         temp := temp(23 downto 0) & temp(31 downto 24);
-                        
-                        -- SubWord: process each byte separately
+                        -- SubWord
                         for j in 0 to 3 loop
-                            temp_byte := temp(31-8*j downto 24-8*j);
-                            temp(31-8*j downto 24-8*j) := SBOX(to_integer(unsigned(temp_byte)));
+                            temp(31-8*j downto 24-8*j) := 
+                                SBOX(to_integer(unsigned(temp(31-8*j downto 24-8*j))));
                         end loop;
-                        
-                        -- XOR with round constant
+                        -- XOR with Rcon
                         temp := temp xor (rcon(i/4) & X"000000");
                     end if;
-                    
                     w(i) := w(i-4) xor temp;
-                end loop;
-                
-                -- Pack round keys
-                for i in 0 to 10 loop
-                    round_keys(1407-128*i downto 1280-128*i) <= 
-                        w(4*i) & w(4*i+1) & w(4*i+2) & w(4*i+3);
+                    
+                    -- Pack round keys as they are generated
+                    if (i mod 4 = 3) and (i > 3) then
+                        round_keys(1407-128*(i/4) downto 1280-128*(i/4)) <= 
+                            w(i-3) & w(i-2) & w(i-1) & w(i);
+                    end if;
                 end loop;
                 
                 key_expanded <= '1';
@@ -240,20 +238,8 @@ begin
         end if;
     end process;
 
-    -- Debug process
-    debug_process: process(clk)
-    begin
-        if rising_edge(clk) then
-            debug_state_out <= state;
-            debug_sub_bytes_out <= sub_bytes(state);
-            debug_shift_rows_out <= shift_rows(debug_sub_bytes_out);
-            debug_mix_cols_out <= mix_columns(debug_shift_rows_out);
-            debug_round_key_out <= current_round_key;
-        end if;
-    end process;
-
     -- Main encryption process
-    main_process: process(clk, rst)
+    main_proc: process(clk, rst)
         variable next_state : state_array;
     begin
         if rst = '1' then
@@ -261,36 +247,38 @@ begin
             done_i <= '0';
             state <= (others => (others => (others => '0')));
         elsif rising_edge(clk) then
-            if key_expanded = '1' then
+            if key_expanded = '1' then  -- Wait for key expansion
                 case round is
                     when 0 =>
-                        -- First load initial state
-                        for i in 0 to 3 loop
-                            for j in 0 to 3 loop
-                                -- Load state and perform initial AddRoundKey in one step
-                                state(i,j) <= data_in(127-8*(4*i+j) downto 120-8*(4*i+j)) xor 
-                                            round_keys(1407-128*0-8*(4*i+j) downto 1407-128*0-8*(4*i+j)-7);
+                        -- Initial state loading and AddRoundKey
+                        for col in 0 to 3 loop
+                            for row in 0 to 3 loop
+                                state(row,col) <= data_in(127-8*(4*col+row) downto 120-8*(4*col+row)) xor 
+                                                    key(127-8*(4*col+row) downto 120-8*(4*col+row));
                             end loop;
                         end loop;
                         
-                        current_round_key <= round_keys(1279 downto 1152);  -- Round key for round 1
+                        -- Prepare key for next round
+                        current_round_key <= round_keys(1279 downto 1152);
                         round <= round + 1;
+                        initial_state_loaded <= '1';
 
                     when 1 to 9 =>
-                        -- Main rounds with proper indexing
+                        -- Apply transformations in sequence
                         next_state := sub_bytes(state);
                         next_state := shift_rows(next_state);
                         next_state := mix_columns(next_state);
                         
-                        -- AddRoundKey with safe indexing
-                        for i in 0 to 3 loop
-                            for j in 0 to 3 loop
-                                state(i,j) <= next_state(i,j) xor 
-                                            current_round_key(127-8*(4*i+j) downto 128-8*(4*i+j)-8);
+                        -- AddRoundKey with proper key selection
+                        for col in 0 to 3 loop
+                            for row in 0 to 3 loop
+                                state(row,col) <= next_state(row,col) xor 
+                                                    current_round_key(127-8*(4*col+row) downto 120-8*(4*col+row));
                             end loop;
                         end loop;
                         
-                        current_round_key <= round_keys(1407-128*(round) downto 1280-128*(round));
+                        -- Update round key untuk round berikutnya
+                        current_round_key <= round_keys(1279-128*round downto 1152-128*round);
                         round <= round + 1;
 
                     when 10 =>
@@ -301,16 +289,32 @@ begin
                             -- Final AddRoundKey
                             for i in 0 to 3 loop
                                 for j in 0 to 3 loop
-                                    state(i,j) <= next_state(i,j) xor 
-                                                current_round_key(127-8*(4*i+j) downto 128-8*(4*i+j)-8);
+                                    state(j,i) <= next_state(j,i) xor 
+                                                    current_round_key(127-8*(4*i+j) downto 120-8*(4*i+j));
                                 end loop;
                             end loop;
-                            
                             done_i <= '1';
                         end if;
 
                     when others => null;
                 end case;
+            end if;
+        end if;
+    end process;
+
+    -- Debug process
+    debug_proc: process(clk)
+    begin
+        if rising_edge(clk) then
+            -- Update debug signals
+            debug_state_out <= state;
+            debug_round_key_out <= current_round_key when round > 0 else key;
+            
+            -- Show transformations only after initial state loaded
+            if initial_state_loaded = '1' or round > 0 then
+                debug_sub_bytes_out <= sub_bytes(state);
+                debug_shift_rows_out <= shift_rows(sub_bytes(state));
+                debug_mix_cols_out <= mix_columns(shift_rows(sub_bytes(state)));
             end if;
         end if;
     end process;
@@ -322,9 +326,9 @@ begin
     output_process: process(state)
         variable temp : STD_LOGIC_VECTOR(127 downto 0);
     begin
-        for i in 0 to 3 loop
-            for j in 0 to 3 loop
-                temp(127-8*(4*i+j) downto 120-8*(4*i+j)) := state(i,j);
+        for col in 0 to 3 loop
+            for row in 0 to 3 loop
+                temp(127-8*(4*col+row) downto 120-8*(4*col+row)) := state(row,col);
             end loop;
         end loop;
         data_out <= temp;

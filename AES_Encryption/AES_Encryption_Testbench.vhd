@@ -186,7 +186,7 @@ begin
     begin
         -- Open files
         file_open(input_file, "aes_test_vectors.txt", read_mode);
-        file_open(output_file, "aes_debug.txt", write_mode);
+        file_open(output_file, "aes_test_results.txt", write_mode);
 
         -- Read test vector
         readline(input_file, input_line);

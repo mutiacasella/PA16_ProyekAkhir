@@ -53,61 +53,59 @@ R11
 R12
 R13
 Eaes_encryption
-Z14 w1733501575
-Z15 DPx4 ieee 16 std_logic_textio 0 22 ^l:n6VFdg74Q?CKDhjD]D3
+Z14 w1733551234
 R1
-Z16 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
+Z15 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
 R2
 R3
-!i122 429
+!i122 465
 R4
-Z17 8C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd
-Z18 FC:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd
+Z16 8C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd
+Z17 FC:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd
 l0
-L7 1
-VXBFPaV_N1W7nC=`NLBkR70
-!s100 nI:bUjb7f:IfK?SdS<7Gh1
+L6 1
+Vmbhmdam?QOU9GYkcSizG50
+!s100 hEK16aWDlBWBD_>J^@9bC2
 R7
 33
-Z19 !s110 1733501733
+Z18 !s110 1733552038
 !i10b 1
-Z20 !s108 1733501733.000000
-Z21 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd|
-Z22 !s107 C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd|
+Z19 !s108 1733552038.000000
+Z20 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd|
+Z21 !s107 C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption.vhd|
 !i113 1
 R12
 R13
 Abehavioral
-R15
 R1
-R16
+R15
 R2
 R3
-DEx4 work 14 aes_encryption 0 22 XBFPaV_N1W7nC=`NLBkR70
-!i122 429
+DEx4 work 14 aes_encryption 0 22 mbhmdam?QOU9GYkcSizG50
+!i122 465
 l192
-L24 310
-V[8HVg<o3kGTEY^he?MS0K0
-!s100 >9lm3gdcWA?eGRDWE_Bl`0
+L23 315
+VeS`XYQf_dF8I`zIc6jGKY2
+!s100 a^^[19Z<n2GlnjG9IzmhJ2
 R7
 33
-R19
+R18
 !i10b 1
+R19
 R20
 R21
-R22
 !i113 1
 R12
 R13
 Eaes_encryption_testbench
-Z23 w1733501028
-Z24 DPx3 std 3 env 0 22 d?`1ck@NdeD@H3RZG7FgZ2
+Z22 w1733552021
+Z23 DPx3 std 3 env 0 22 d?`1ck@NdeD@H3RZG7FgZ2
 R1
-R16
 R15
+Z24 DPx4 ieee 16 std_logic_textio 0 22 ^l:n6VFdg74Q?CKDhjD]D3
 R2
 R3
-!i122 430
+!i122 466
 R4
 Z25 8C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption_Testbench.vhd
 Z26 FC:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption_Testbench.vhd
@@ -117,32 +115,32 @@ VKGkCFLAVC?20J`IOR`<Y91
 !s100 HHQO2Zn2RlK`2PG]>GlC81
 R7
 33
-R19
+R18
 !i10b 1
-R20
+R19
 Z27 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption_Testbench.vhd|
 Z28 !s107 C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Encryption_Testbench.vhd|
 !i113 1
 R12
 R13
 Abehavioral
-R24
+R23
 R1
-R16
 R15
+R24
 R2
 R3
 DEx4 work 24 aes_encryption_testbench 0 22 KGkCFLAVC?20J`IOR`<Y91
-!i122 430
+!i122 466
 l151
 L13 273
-VikJIk0lXm_1B3VIdi<VhP2
-!s100 oooD>7WNjPE@1nW877z0[0
+Vz48HcAZlEBP68nKF^h[YD2
+!s100 6l:B6e<CSmbQhlef46<:^0
 R7
 33
-R19
+R18
 !i10b 1
-R20
+R19
 R27
 R28
 !i113 1
@@ -151,7 +149,7 @@ R13
 Paes_package
 R2
 R3
-!i122 431
+!i122 467
 w1733412473
 R4
 8C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Package.vhd
@@ -162,9 +160,9 @@ VH;A>miQIBJ2Iji:eIN8Ra2
 !s100 _6=E6PUZYQNn7UBIUmCIO3
 R7
 33
-R19
+R18
 !i10b 1
-R20
+R19
 !s90 -reportprogress|300|-work|work|-2008|-explicit|-stats=none|C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Package.vhd|
 !s107 C:/Users/fatha/OneDrive/Documents/Tugas Kuliah/PSD/Proyek_PSD_PA16/PA16_ProyekAkhir/AES_Encryption/AES_Package.vhd|
 !i113 1
@@ -173,7 +171,7 @@ R13
 Ekey_expansion
 Z29 w1733477817
 R1
-R16
+R15
 R2
 R3
 !i122 358
@@ -196,7 +194,7 @@ R12
 R13
 Abehavioral
 R1
-R16
+R15
 R2
 R3
 DEx4 work 13 key_expansion 0 22 e`g<mX?Gn1AlSM0`W@@S:3
@@ -304,7 +302,7 @@ R13
 Esub_bytes
 Z44 w1733477818
 R1
-R16
+R15
 R2
 R3
 !i122 361
@@ -327,7 +325,7 @@ R12
 R13
 Abehavioral
 R1
-R16
+R15
 R2
 R3
 DEx4 work 9 sub_bytes 0 22 Eg[j<`YKPGa_cLnSj9oEH1
