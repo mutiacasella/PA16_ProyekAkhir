@@ -1,0 +1,24 @@
+File text ini berisi contoh beberapa test vectors dan expected outputnya
+
+Sumber:
+- NIST Special Publication 800-38A
+Link: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
+- FIPS 197 (Federal Information Processing Standards Publication 197)
+Link: https://csrc.nist.gov/csrc/media/publications/fips/197/final/documents/fips-197.pdf
+- RFC 3602: The AES-CBC Cipher Algorithm
+Link: https://datatracker.ietf.org/doc/html/rfc3602
+- NIST Cryptographic Algorithm Validation Program (CAVP)
+Link: https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/block-ciphers
+
+Test vectors:
+|          <plaintext>          |              <key>             |          <ciphertext>          |
+00112233445566778899aabbccddeeff 000102030405060708090a0b0c0d0e0f 69c4e0d86a7b0430d8cdb78070b4c55a
+6bc1bee22e409f96e93d7e117393172a 2b7e151628aed2a6abf7158809cf4f3c 3ad77bb40d7a3660a89ecaf32466ef97
+ae2d8a571e03ac9c9eb76fac45af8e51 2b7e151628aed2a6abf7158809cf4f3c f5d3d58503b9699de785895a96fdbaaf
+3243f6a8885a308d313198a2e0370734 2b7e151628aed2a6abf7158809cf4f3c 3925841d02dc09fbdc118597196a0b32
+00000000000000000000000000000000 10a58869d74be5a374cf867cfb473859 6d251e6944b051e04eaa6fb4dbf78465
+ffffffffffffffffffffffffffffffff 000102030405060708090a0b0c0d0e0f 8dae3b9ddf5b89bfa7d52818885d43fd
+0123456789abcdef0123456789abcdef fedcba9876543210fedcba9876543210 0aceab0fc6a0a28d6f54ec7c7b5473e4
+54776f204f6e65204e696e652054776f 5477656e747920546872656520546872 29c3505f571420f6402299b31a02d73a
+00000000000000000000000000000000 00000000000000000000000000000000 66e94bd4ef8a2c3b884cfa59ca342b2e
+00000000000000000000000000000000 ffffffffffffffffffffffffffffffff 1365f5c0972178980fe5e4889c1aa373
