@@ -206,20 +206,20 @@ Algoritma AES pada umumnya, bekerja dengan mengenkripsi data dalam blok berukura
 ## **Testing 📝**
 - **Wave Function using ModelSim**
 
-![Cute Cat](Dokumentasi\EncryptionWaveFunction.png)
+![Cute Cat](Dokumentasi/EncryptionWaveFunction.png)
 
 - **Output File**
 
-![Cute Cat](Dokumentasi\EncryptionPASS.png)
+![Cute Cat](Dokumentasi/EncryptionPASS.png)
 
 
 - **Synthesis using Quartus Prime**
 
-![Cute Cat](Dokumentasi\EncryptionSynthesis.png)
+![Cute Cat](Dokumentasi/EncryptionSynthesis.png)
 
 - **Synthesis using Quartus Prime (Zoomed in)**
 
-![Cute Cat](Dokumentasi\EncryptionSynthesisZoom.png)
+![Cute Cat](Dokumentasi/EncryptionSynthesisZoom.png)
 
 
 ## **Authors ✍️**
