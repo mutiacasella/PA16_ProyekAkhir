@@ -116,7 +116,7 @@ architecture Behavioral of AES_Decryption is
         end loop;
         return result;
     end function;
-
+    
     -- Inverse SubBytes transformation
     function inv_sub_bytes(state_in: state_array) return state_array is
         variable result : state_array;
@@ -216,23 +216,19 @@ begin
         type word_array is array (0 to 43) of STD_LOGIC_VECTOR(31 downto 0);
         variable w : word_array;
         variable temp : STD_LOGIC_VECTOR(31 downto 0);
-        variable reversed_keys : STD_LOGIC_VECTOR(1407 downto 0);
     begin
         if rst = '1' then
             key_expanded <= '0';
             round_keys <= (others => '0');
         elsif rising_edge(clk) then
             if not key_expanded then
-                -- Store original key as first round key
-                round_keys(1407 downto 1280) <= key;
-
-                -- Initialize w with key
+                -- Inisialisasi dengan kunci asli
                 w(0) := key(127 downto 96);
                 w(1) := key(95 downto 64);
                 w(2) := key(63 downto 32);
                 w(3) := key(31 downto 0);
-
-                -- Generate remaining words
+    
+                -- Ekspansi kunci untuk semua round
                 for i in 4 to 43 loop
                     temp := w(i-1);
                     if (i mod 4 = 0) then
@@ -241,32 +237,26 @@ begin
                         -- SubWord
                         for j in 0 to 3 loop
                             temp(31-8*j downto 24-8*j) := 
-                                SBOX(to_integer(unsigned(temp(31-8*j downto 24-8*j)))); -- SBOX digunakan untuk key schedule
+                                SBOX(to_integer(unsigned(temp(31-8*j downto 24-8*j))));
                         end loop;
-                        -- XOR with Rcon
+                        -- XOR dengan Rcon
                         temp := temp xor (rcon(i/4) & X"000000");
                     end if;
+                    -- XOR dengan kunci sebelumnya
                     w(i) := w(i-4) xor temp;
-
-                    -- Pack round keys as they are generated
-                    if (i mod 4 = 3) and (i > 3) then
-                        round_keys(1407-128*(i/4) downto 1280-128*(i/4)) <= 
+    
+                    -- Gabungkan menjadi round key 128-bit
+                    if (i mod 4 = 3) then
+                        round_keys(1407-128*(i/4) downto 1407-128*(i/4)-127) <= 
                             w(i-3) & w(i-2) & w(i-1) & w(i);
                     end if;
                 end loop;
-
-                -- Reverse the round keys for decryption
-                for i in 0 to 10 loop
-                    reversed_keys(1407-128*i downto 1280-128*i) := 
-                        round_keys(128*i+127 downto 128*i);
-                end loop;
-                round_keys <= reversed_keys;
-
+    
                 key_expanded <= '1';
             end if;
         end if;
     end process;
-
+     
     -- Main decryption process
     main_proc: process(clk, rst)
         variable next_state : state_array;
@@ -288,7 +278,7 @@ begin
                             end loop;
                         end loop;
     
-                        -- Persiapkan round key untuk round berikutnya
+                        -- Round key untuk round berikutnya
                         current_round_key <= round_keys(1407-128*round downto 1407-128*round-127);
                         round <= round - 1;
     
@@ -306,7 +296,6 @@ begin
                             end loop;
                         end loop;
     
-                        -- Persiapkan round key untuk round berikutnya
                         current_round_key <= round_keys(1407-128*round downto 1407-128*round-127);
                         round <= round - 1;
     
