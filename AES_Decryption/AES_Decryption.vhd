@@ -222,13 +222,16 @@ begin
             round_keys <= (others => '0');
         elsif rising_edge(clk) then
             if not key_expanded then
-                -- Inisialisasi dengan kunci asli
+                -- Store original key as first round key
+                round_keys(1407 downto 1280) <= key;
+
+                -- Initialize w with key
                 w(0) := key(127 downto 96);
                 w(1) := key(95 downto 64);
                 w(2) := key(63 downto 32);
                 w(3) := key(31 downto 0);
     
-                -- Ekspansi kunci untuk semua round
+                -- Generate remaining words
                 for i in 4 to 43 loop
                     temp := w(i-1);
                     if (i mod 4 = 0) then
@@ -242,10 +245,9 @@ begin
                         -- XOR dengan Rcon
                         temp := temp xor (rcon(i/4) & X"000000");
                     end if;
-                    -- XOR dengan kunci sebelumnya
                     w(i) := w(i-4) xor temp;
     
-                    -- Gabungkan menjadi round key 128-bit
+                    -- Pack round keys as they are generated
                     if (i mod 4 = 3) then
                         round_keys(1407-128*(i/4) downto 1407-128*(i/4)-127) <= 
                             w(i-3) & w(i-2) & w(i-1) & w(i);
@@ -265,12 +267,11 @@ begin
             round <= 10; -- Start from the last round
             done_i <= '0';
             state <= (others => (others => (others => '0')));
-            current_round_key <= (others => '0');
         elsif rising_edge(clk) then
             if key_expanded = '1' then -- Wait for key expansion
                 case round is
                     when 10 =>
-                        -- AddRoundKey untuk round terakhir
+                        -- AddRoundKey for last round
                         for col in 0 to 3 loop
                             for row in 0 to 3 loop
                                 state(row, col) <= data_in(127-8*(4*col+row) downto 120-8*(4*col+row)) xor 
@@ -283,7 +284,7 @@ begin
                         round <= round - 1;
     
                     when 1 to 9 =>
-                        -- Transformasi dekripsi: InvShiftRows, InvSubBytes, InvMixColumns
+                        -- Decrypt process: InvShiftRows, InvSubBytes, InvMixColumns
                         next_state := inv_shift_rows(state);
                         next_state := inv_sub_bytes(next_state);
                         next_state := inv_mix_columns(next_state);
@@ -300,11 +301,10 @@ begin
                         round <= round - 1;
     
                     when 0 =>
-                        -- Transformasi terakhir tanpa InvMixColumns
                         next_state := inv_shift_rows(state);
                         next_state := inv_sub_bytes(next_state);
     
-                        -- AddRoundKey
+                        -- Final AddRoundKey
                         for col in 0 to 3 loop
                             for row in 0 to 3 loop
                                 state(row, col) <= next_state(row, col) xor 
