@@ -1,15 +1,15 @@
-# Final Project PSD PA16 - AES ENCRYPTION HARDWARE ACCELERATOR
+# ***PSD PA16 - AES Encryption Hardware Accelerator📌***
 
-## Background
-Keamanan data telah menjadi perhatian utama dalam era digital saat ini, di mana setiap informasi yang disimpan dan ditransmisikan dapat dengan mudah diakses oleh pihak yang tidak diinginkan. Oleh karena itu, dikembangkan berbagai metode-metode kriptografi yang mengenkripsi data supaya tidak bisa diinterpretasikan oleh pihak yang tidak berwenang. Salah satu metode kriptografi yang banyak digunakan untuk melindungi data adalah algoritma *Advanced Encryption Standard* (AES). AES merupakan algoritma simetris yang aman dan efisien sehingga telah diterima secara luas sebagai standar enkripsi oleh pemerintah dan industri di seluruh dunia.
+## **Hey There! 👋**
+Repositori ini berisi pengumpulan proyek akhir praktikum PSD dari kelompok PA16. Pada repo ini, terdapat program `enkripsi`, `dekripsi`, serta `testbench`-nya masing - masing untuk implementasi VDHL dari algoritma enkripsi standar, yaitu *Advanced Encryption Standard* (AES). Repositori ini juga sudah berisi dokumentasi lengkap pembuatan proyek ini, yaitu dalam bentuk `laporan`, `powerpoint`, dan juga `readme` ini sendiri.
 
-## How it works
-AES bekerja dengan mengenkripsi data dalam blok berukuran 128-bit dalam bentuk akselerator enkripsi untuk memproses enkripsi dan dekripsi data secara cepat dan efisien. Akselerator ini akan menggunakan teknik paralelisme dan pipelining untuk meningkatkan performa dari setiap operasi yang dilakukan oleh algoritma AES, yakni *SubBytes*, *ShiftRows*, *MixColumns*, dan *AddRoundKey*. Algoritma ini akan dijalankan dalam 10 ronde untuk kunci 128-bit, dengan input berupa blok plaintext 128-bit dan kunci enkripsi, serta output berupa ciphertext yang terenkripsi.
+## **Background 🔎**
+Keamanan data telah menjadi perhatian utama dalam era digital saat ini, di mana setiap informasi yang disimpan dan ditransmisikan dapat dengan mudah diakses oleh pihak yang tidak diinginkan. Oleh karena itu, dikembangkan berbagai metode-metode kriptografi yang mengenkripsi data supaya tidak bisa diinterpretasikan oleh pihak yang tidak berwenang. Salah satu metode kriptografi yang banyak digunakan untuk melindungi data adalah algoritma ***Advanced Encryption Standard*** **(AES)**.
 
-Desain akselerator ini bertujuan untuk mencapai kinerja yang lebih tinggi dibandingkan implementasi perangkat lunak, serta menyediakan kemampuan untuk melakukan dekripsi menggunakan algoritma invers dari langkah enkripsi.
+## **How it Works 🛠️**
+Algoritma AES pada umumnya, bekerja dengan mengenkripsi data dalam blok berukuran 128-bit dalam bentuk akselerator enkripsi untuk memproses enkripsi dan dekripsi data secara cepat dan efisien. Akselerator ini akan menggunakan teknik paralelisme dan pipelining untuk meningkatkan performa dari setiap operasi yang dilakukan oleh algoritma AES, yakni `SubBytes`, `ShiftRows`, `MixColumns`, dan `AddRoundKey`. Pada implementasi kami, algoritma ini akan dijalankan dalam 10 ronde dengan kunci 128-bit dan input *plaintext* data 128-bit, serta output berupa *ciphertext* 128-bit yang telah terenkripsi.
 
-## Penjelasan Kode
-Berikut penjelasan mengenai komponen-komponen pembentuk program enkripsi dan dekripsi AES.
+## **Code Implementation </>**
 1. **AddRoundKey**
     ```vhdl
     for col in 0 to 3 loop
@@ -203,10 +203,29 @@ Berikut penjelasan mengenai komponen-komponen pembentuk program enkripsi dan dek
     ```
     merupakan *function* yang digunakan untuk melakukan proses MixColumns dengan cara melakukan operasi perkalian pada *Galois Field* untuk menghasilkan data yang terenkripsi.
 
-## Testing
-Uji coba program enkripsi dan dekripsi berbasis AES dilakukan dengan menggunakan *testbench* dengan memasukkan nilai *plaintext* dan kunci enkripsi berukuran 128 bit ke dalam nilai input untuk melakukan enkripsi pada data, serta *chipertext* dan kunci yang sama ke dalam input untuk melakukan proses dekripsi. Informasi lebih lanjut mengenai hasil uji coba program dapat dilihat pada file laporan proyek akhir. 
+## **Testing 📝**
+- **Wave Function using ModelSim**
 
-## Authors
-- [@IfanFYS](https://github.com/IfanFYS)
-- [@MRafli127](https://github.com/MRafli127)
-- [@mutiacasella](https://github.com/mutiacasella)
+![Cute Cat](Dokumentasi\EncryptionWaveFunction.png)
+
+- **Output File**
+
+![Cute Cat](Dokumentasi\EncryptionPASS.png)
+
+
+- **Synthesis using Quartus Prime**
+
+![Cute Cat](Dokumentasi\EncryptionSynthesis.png)
+
+- **Synthesis using Quartus Prime (Zoomed in)**
+
+![Cute Cat](Dokumentasi\EncryptionSynthesisZoom.png)
+
+
+## **Authors ✍️**
+| Group PA16 Members | Student Number |
+| :----------------: | :------------: |
+| [**@Fathan Yazid Satriani**](https://github.com/IfanFYS)| 2306250560 |
+| [**@Mutia Casella**](https://github.com/mutiacasella)| 2306202870 |
+| [**@Muhammad Rafli**](https://github.com/MRafli127)| 2306250730 |
+
